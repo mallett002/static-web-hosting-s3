@@ -7,7 +7,7 @@ export class VerdadeStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
       // make route 53 with ACM Cert
-      new Route53Construct(scope, 'Route53Construct');
+      new Route53Construct(this, 'Route53Construct');
 
       // s3 buckets  
       // cloudfront
