@@ -1,0 +1,33 @@
+import { Construct } from 'constructs';
+import * as s3Deploy from 'aws-cdk-lib/aws-s3-deployment';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import { RemovalPolicy } from 'aws-cdk-lib';
+import { resolve } from 'path';
+
+export class S3Construct extends Construct {
+    constructor(scope: Construct, id: string) {
+      super(scope, id);
+
+      // Create the www one with the index.html
+      // won't have static web hosting enabled
+      // use https
+      const assetBucket = new s3.Bucket(this, 'AssetBucket', {
+        bucketName: 'www.williamalanmallett.link',
+        removalPolicy: RemovalPolicy.DESTROY,
+        autoDeleteObjects: true
+        // websiteIndexDocument: 'index.html',
+        // publicReadAccess: true,
+      });
+
+      new s3Deploy.BucketDeployment(this, 'DeployWebsite', {
+        // sources: [s3Deploy.Source.asset('.')],
+        sources: [s3Deploy.Source.asset(resolve(__dirname, '../../dist'))],
+        destinationBucket: assetBucket,
+        retainOnDelete: false
+      });
+
+      // Create the non www one that will redirect to the www one
+      // will have static web hosting enabled
+      // use https
+    }
+  }
