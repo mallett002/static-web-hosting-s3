@@ -3,6 +3,7 @@ import * as s3Deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { resolve } from 'path';
+import { RedirectProtocol } from 'aws-cdk-lib/aws-s3';
 
 export class S3Construct extends Construct {
     constructor(scope: Construct, id: string) {
@@ -29,5 +30,13 @@ export class S3Construct extends Construct {
       // Create the non www one that will redirect to the www one
       // will have static web hosting enabled
       // use https
+      const redirectBucket = new s3.Bucket(this, 'RedirectBucket', {
+        bucketName: 'williamalanmallett.link',
+        removalPolicy: RemovalPolicy.DESTROY,
+        websiteRedirect: {
+            hostName: 'www.williamalanmallet.link',
+            protocol: RedirectProtocol.HTTPS
+        }
+      });
     }
   }
