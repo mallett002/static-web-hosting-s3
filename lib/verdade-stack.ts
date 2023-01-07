@@ -3,16 +3,17 @@ import { Construct } from 'constructs';
 
 import { Route53Construct } from '../lib/constructs/route-53-construct';
 import { S3Construct } from '../lib/constructs/s3-construct';
+import { CloudFrontConstruct } from '../lib/constructs/cloudfront-construct';
 
 export class VerdadeStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-      // make route 53 with ACM Cert
-      new Route53Construct(this, 'Route53Construct');
+      const route53 = new Route53Construct(this, 'Route53Construct');
+      const s3Constructs = new S3Construct(this, 'S3Construct');
 
-      // s3 buckets
-      new S3Construct(this, 'S3Construct');
-      // cloudfront
-      
+      new CloudFrontConstruct(this, 'CloudFrontConstruct', {
+        assetBucket: s3Constructs.assetBucket,
+        certificate: route53.certificate
+      });
   }
 }

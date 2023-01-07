@@ -4,6 +4,8 @@ import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 
 export class Route53Construct extends Construct {
+  public readonly certificate: cdk.aws_certificatemanager.Certificate;
+
   constructor(scope: Construct, id: string) {
     super(scope, id);
       const zoneId = process.env.HOSTED_ZONE_ID || '';
@@ -13,7 +15,7 @@ export class Route53Construct extends Construct {
         zoneName: 'williamalanmallett.link',
       });
 
-      const cert = new acm.Certificate(this, 'williamAlanMallettCert', {
+      this.certificate = new acm.Certificate(this, 'williamAlanMallettCert', {
         domainName: 'williamalanmallett.link',
         certificateName: 'William Alan Mallett Cert',
         subjectAlternativeNames: ['*.williamalanmallett.link'],

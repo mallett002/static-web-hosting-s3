@@ -6,13 +6,15 @@ import { resolve } from 'path';
 import { RedirectProtocol } from 'aws-cdk-lib/aws-s3';
 
 export class S3Construct extends Construct {
+    public readonly assetBucket: s3.Bucket;
+
     constructor(scope: Construct, id: string) {
       super(scope, id);
 
       // Create the www one with the index.html
       // won't have static web hosting enabled
       // use https
-      const assetBucket = new s3.Bucket(this, 'AssetBucket', {
+      this.assetBucket = new s3.Bucket(this, 'AssetBucket', {
         bucketName: 'www.williamalanmallett.link',
         removalPolicy: RemovalPolicy.DESTROY,
         autoDeleteObjects: true
@@ -23,7 +25,7 @@ export class S3Construct extends Construct {
       new s3Deploy.BucketDeployment(this, 'DeployWebsite', {
         // sources: [s3Deploy.Source.asset('.')],
         sources: [s3Deploy.Source.asset(resolve(__dirname, '../../dist'))],
-        destinationBucket: assetBucket,
+        destinationBucket: this.assetBucket,
         retainOnDelete: false
       });
 
