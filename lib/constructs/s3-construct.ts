@@ -23,7 +23,6 @@ export class S3Construct extends Construct {
       });
 
       new s3Deploy.BucketDeployment(this, 'DeployWebsite', {
-        // sources: [s3Deploy.Source.asset('.')],
         sources: [s3Deploy.Source.asset(resolve(__dirname, '../../dist'))],
         destinationBucket: this.assetBucket,
         retainOnDelete: false
