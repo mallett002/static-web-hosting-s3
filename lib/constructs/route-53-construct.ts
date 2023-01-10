@@ -5,12 +5,13 @@ import * as route53 from 'aws-cdk-lib/aws-route53';
 
 export class Route53Construct extends Construct {
   public readonly certificate: cdk.aws_certificatemanager.Certificate;
+  public readonly hostedZone: route53.IHostedZone;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
       const zoneId = process.env.HOSTED_ZONE_ID || '';
 
-      const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, `HostedZone`, {
+      this.hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, `HostedZone`, {
         hostedZoneId: zoneId,
         zoneName: 'williamalanmallett.link',
       });
@@ -19,7 +20,7 @@ export class Route53Construct extends Construct {
         domainName: 'williamalanmallett.link',
         certificateName: 'William Alan Mallett Cert',
         subjectAlternativeNames: ['*.williamalanmallett.link'],
-        validation: acm.CertificateValidation.fromDns(hostedZone)
+        validation: acm.CertificateValidation.fromDns(this.hostedZone)
       });
 
       // new route53.ARecord(this, 'AliasRecord', {
