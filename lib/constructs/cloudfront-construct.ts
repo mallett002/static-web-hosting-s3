@@ -5,7 +5,7 @@ import * as origins from 'aws-cdk-lib/aws-cloudfront-origins'
 import * as s3 from 'aws-cdk-lib/aws-s3';
 
 export interface CloudFrontProps {
-    assetBucket: s3.IBucket
+    assetBucket: s3.IBucket,
     certificate: cdk.aws_certificatemanager.Certificate
 }
 
@@ -20,6 +20,12 @@ export class CloudFrontConstruct extends Construct {
         
         props.assetBucket.grantRead(this.originAccessIdentity);
 
+        const logBucket = new s3.Bucket(this, 'CloudfrontLoggingBucket', {
+            bucketName: 'bucket-for-cloudfront-logs',
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+            autoDeleteObjects: true,
+        });
+
         this.subdomainDistribution = new cloudfront.Distribution(this, 'SubdomainDistribution', {
             defaultRootObject: 'index.html',
             enabled: true,
@@ -28,9 +34,9 @@ export class CloudFrontConstruct extends Construct {
             defaultBehavior: {
                 origin: new origins.S3Origin(props.assetBucket, {originAccessIdentity: this.originAccessIdentity}),
                 viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
-            }
+            },
+            enableLogging: true,
+            logBucket
         });
-
-        // use OAC over OAI: https://lightrun.com/answers/aws-aws-cdk-cloudfront-support-origin-access-control
     }
 }

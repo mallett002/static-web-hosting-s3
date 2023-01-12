@@ -7,19 +7,17 @@ import { RedirectProtocol } from 'aws-cdk-lib/aws-s3';
 
 export class S3Construct extends Construct {
     public readonly assetBucket: s3.Bucket;
+    public readonly redirectBucket: s3.Bucket;
 
     constructor(scope: Construct, id: string) {
       super(scope, id);
 
-      // Create the www one with the index.html
-      // won't have static web hosting enabled
-      // use https
       this.assetBucket = new s3.Bucket(this, 'AssetBucket', {
+        encryption: s3.BucketEncryption.S3_MANAGED,
+        accessControl: s3.BucketAccessControl.PRIVATE,
         bucketName: 'www.williamalanmallett.link',
         removalPolicy: RemovalPolicy.DESTROY,
         autoDeleteObjects: true
-        // websiteIndexDocument: 'index.html',
-        // publicReadAccess: true,
       });
 
       new s3Deploy.BucketDeployment(this, 'DeployWebsite', {
@@ -28,10 +26,7 @@ export class S3Construct extends Construct {
         retainOnDelete: false
       });
 
-      // Create the non www one that will redirect to the www one
-      // will have static web hosting enabled
-      // use https
-      const redirectBucket = new s3.Bucket(this, 'RedirectBucket', {
+      this.redirectBucket = new s3.Bucket(this, 'RedirectBucket', {
         bucketName: 'williamalanmallett.link',
         removalPolicy: RemovalPolicy.DESTROY,
         websiteRedirect: {
