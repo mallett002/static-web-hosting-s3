@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
+import {DOMAIN} from '../../constants';
 
 export class Route53Construct extends Construct {
   public readonly certificate: cdk.aws_certificatemanager.Certificate;
@@ -11,23 +12,18 @@ export class Route53Construct extends Construct {
     super(scope, id);
       const zoneId = process.env.HOSTED_ZONE_ID || '';
 
+      // Get the hosted zone that was created with domain name purchase:
       this.hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, `HostedZone`, {
         hostedZoneId: zoneId,
-        zoneName: 'williamalanmallett.link',
+        zoneName: DOMAIN,
       });
 
+      // Request a public cert:
       this.certificate = new acm.Certificate(this, 'williamAlanMallettCert', {
-        domainName: 'williamalanmallett.link',
+        domainName: DOMAIN,
         certificateName: 'William Alan Mallett Cert',
-        subjectAlternativeNames: ['*.williamalanmallett.link'],
+        subjectAlternativeNames: [`*.${DOMAIN}`], // wildcard certificate for all subdomains
         validation: acm.CertificateValidation.fromDns(this.hostedZone)
       });
-
-      // new route53.ARecord(this, 'AliasRecord', {
-      //   zone: hostedZone,
-      //   target: route53.RecordTarget.fromAlias(new targets.ApiGateway(restApi)),
-      //   // or - route53.RecordTarget.fromAlias(new alias.ApiGatewayDomain(domainName)),
-      // });
-
   }
 }
