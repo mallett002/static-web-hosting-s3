@@ -13,7 +13,6 @@ export class S3Construct extends Construct {
     constructor(scope: Construct, id: string) {
       super(scope, id);
 
-      // S3 Bucket for subdomain (The one with index.html)
       this.assetBucket = new s3.Bucket(this, 'AssetBucket', {
         bucketName: SUB_DOMAIN,
         removalPolicy: RemovalPolicy.DESTROY,
@@ -26,7 +25,6 @@ export class S3Construct extends Construct {
         retainOnDelete: false
       });
 
-      // Redirect bucket that goes to the assetBucket
       this.redirectBucket = new s3.Bucket(this, 'RedirectBucket', {
         bucketName: DOMAIN,
         removalPolicy: RemovalPolicy.DESTROY,

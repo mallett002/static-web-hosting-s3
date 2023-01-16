@@ -12,13 +12,11 @@ export class Route53Construct extends Construct {
     super(scope, id);
       const zoneId = process.env.HOSTED_ZONE_ID || '';
 
-      // Get the hosted zone that was created with domain name purchase:
       this.hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, `HostedZone`, {
         hostedZoneId: zoneId,
         zoneName: DOMAIN,
       });
 
-      // Request a public cert:
       this.certificate = new acm.Certificate(this, 'williamAlanMallettCert', {
         domainName: DOMAIN,
         certificateName: 'William Alan Mallett Cert',
